@@ -20,16 +20,23 @@ class Post (models.Model):
 
     title = models.CharField(max_length=250, null=True)
     excerpt = models.TextField(null=True)
-    slug = models.SlugField(max_length=250, unique_for_date='publish')
+
     publish = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey (User, on_delete=models.CASCADE, related_name='blog_posts')
     content = models.TextField()
     status = models.CharField(max_length=10, choices=options, default='draft')
     objects = models.Manager() #default manager
     newmanager = NewManager() #custom manager
+    slug = models.SlugField(max_length = 150, unique=False)
 
     def get_absolute_url(self):
         return reverse('blog:post_single',args=[self.slug])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.property_Name, allow_unicode=True)
+        
+        
+        super(Post, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('-publish',)
